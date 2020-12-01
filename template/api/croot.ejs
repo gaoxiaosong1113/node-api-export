@@ -1,0 +1,24 @@
+/**
+* <%= tags.name %>
+* <%= tags.url %>
+*/<% 
+    let url = tags.url.replace(/\-/g,'').replace(/\ /g,'')
+    var pathAry = url.slice(1,url.length).split('/')
+    var name = pathAry[0]
+    for(let i=1; i<pathAry.length; i++){
+        let item = pathAry[i]
+        if(!item){
+            continue;
+        }
+        if(item.indexOf('{')!=-1){
+            item = item.replace('{','').replace('}','')
+        }else{
+            name+=item[0].toUpperCase() + item.slice(1, item.length)
+        }
+    }
+    if(tags.url.indexOf('/')!=0){
+        tags.url='/'+tags.url
+    }
+%>
+export const <%= name %> = (option) => request.<%= tags['method'].toLowerCase() %>(`<%= tags.url.replace(/\{/g,`\$\{option\[\'`).replace(/\}/g,`\'\]\}`) %>`, option)
+

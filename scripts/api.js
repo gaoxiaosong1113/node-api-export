@@ -4,11 +4,12 @@ const chalk = require('chalk')
 const axios = require('axios')
 const fs = require('fs')
 const ejs = require('ejs')
+const path = require('path')
 
 inquirer.prompt([{
     type: 'confirm',
     name: 'confirm',
-    message: '此操作会覆盖选择的 servers 项目下的 info.js 文件,是否继续?',
+    message: '此操作会覆盖 request 的项目下的文件,是否继续?',
 }]).then(confirmRes => {
     if (confirmRes.confirm) {
         const spinner = ora('加载中').start()
@@ -66,17 +67,17 @@ inquirer.prompt([{
                             fs.unlinkSync(`${savePath}/request.js`)
                     }
 
-                    let swaggerFile = String(fs.readFileSync(__dirname + '/./swaggerImport.ejs'))
+                    let swaggerFile = String(fs.readFileSync(path.join(__dirname),  '../template/api/config.ejs'))
                     let swaggerTemplate = ejs.compile(swaggerFile)
-                    let swaggerStr = swaggerTemplate({ serviceId: choicesRes.servers })
+                    let swaggerStr = swaggerTemplate({ serviceId: choicesRes.servers,date:moment().format('YYYY-MM-DD HH:mm:ss') })
 
                     fs.writeFileSync(`${savePath}/request.js`, swaggerStr)
 
                     getApiForJsByAppNameRes.data.tags.map((item, index) => {
-                        let requestFile = String(fs.readFileSync(__dirname + '/./swagger.ejs'))
+                        let requestFile = String(fs.readFileSync(path.join(__dirname),  '../template/api/swagger.ejs'))
                         let requestTemplate = ejs.compile(requestFile)
                         let requestStr = requestTemplate({ tags: item, str: JSON.stringify(item) })
-                        fs.appendFileSync(`${path}/request.js`, requestStr)
+                        fs.appendFileSync(`${path}/request.js`, requestStr.replace(/&#39;/g,'"'))
                         writeFileLoading.stop()
                         console.log(chalk.green(`${item.name} 生成成功`))
                     })
@@ -88,6 +89,9 @@ inquirer.prompt([{
                     throw error
                 })
             }).catch(error => {
+                const message = '请求接口文档地址失败'
+                writeFileLoading.stop()
+                console.log(chalk.red(message))
                 throw error
             })
         }).catch(error => {

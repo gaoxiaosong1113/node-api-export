@@ -1,0 +1,24 @@
+<% for (let path in tags.children){ %>
+    <% for (let requestType in tags.children[path]){ %>
+/**
+* * <%= tags.children[path][requestType].summary %>
+* * <%= tags.children[path][requestType].description %>
+*/<% 
+            var pathAry = path.replace(/\-/g,'').replace(/\ /g,'').split('/');
+            pathAry.splice(0, 1);
+            var name = tags.children[path][requestType]['requestType']
+            for(let i=1; i<pathAry.length; i++){
+                let item = pathAry[i]
+                if(!item){
+                    continue;
+                }
+                if(item.indexOf('{')!=-1){
+                    item = item.replace('{','').replace('}','')
+                }else{
+                    name+=item[0].toUpperCase() + item.slice(1, item.length)
+                }
+            } 
+        %>
+export const <%= name %> = (option) => request.<%= tags.children[path][requestType]['requestType'] %>(`<%= path.replace(/\{/g,`\$\{option\[\'`).replace(/\}/g,`\'\]\}`) %>`, option)
+    <% } %>
+<% } %>

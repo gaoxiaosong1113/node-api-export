@@ -1,0 +1,61 @@
+// 引入 react 依赖
+import React, { Fragment, Component, PureComponent } from 'react';
+
+// 引入 antd-pro 依赖
+import { connect } from 'dva';
+import router from 'umi/router';
+import Link from 'umi/link';
+
+// 引入第三方依赖
+import moment from 'moment';
+
+// 引入 antd 依赖
+import { Form, Card, Row, Col, Modal, Button, Radio, Checkbox, Input, Popconfirm, Badge, Icon, Select, DatePicker, List, Table, message } from 'antd';
+
+// 引入项目内工具包
+import { formatDate } from '@/utils/utils'
+
+// 引入公共工具包
+import { FormLayoutDefine, OssPathUtils, PagesUtils, CodesUtils } from "@/utils/SkUtils";
+
+const { confirm } = Modal;
+
+export default {
+    <% for (let attr in tags.children){ %>
+        /**
+         * * <%= tags.children[attr].summary %>
+         */
+    <% 
+        var attrAry = attr.split('/'), name = '122'
+        if(attrAry[attrAry.length-1]=='{id}'){
+            name = ''
+            for( var i=0; i<attrAry.length-1; i++){
+                var item = attrAry[i]
+                if(i==0){
+                    name += tags.children[attr]['requestType']
+                }
+                if(i>0){
+                    name += item[0].toUpperCase() + item.slice(1,item.length)
+                }
+            }
+        }else{
+            name = attrAry.reverse()[0]
+        } 
+    %><%= name %>(id?) {
+            const { dispatch } = this.props;
+            dispatch({
+                type: '<%= tags.name[0].toLowerCase() _%><%= tags.name.slice(1,tags.name.length) _%>Model/<%= name %>',
+                payload: {
+                  id
+                }
+            }).then(res => {
+                if (!res) {
+                    return
+                }
+                // 刷新页面
+                this.child.handleTableRefresh()
+                message.success('操作成功')
+            });
+        },
+    <% } %>
+}
