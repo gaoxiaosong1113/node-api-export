@@ -1,0 +1,35 @@
+{
+  "name": "sk_platform_brand_common",
+  "version": "2.1.1",
+  "description": "An out-of-box UI solution for enterprise applications",
+  "private": true,
+  "scripts": {
+    "template": "node ./template/generator/index.js",
+    "api": "node ./scripts/api.js"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "inquirer": "^7.3.3",
+    "ora": "^5.1.0"
+  },
+  "devDependencies": {
+    "ejs": "^3.1.5"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^1.10.0"
+  },
+  "lint-staged": {},
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": ""
+    }
+  }
+}
