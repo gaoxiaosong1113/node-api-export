@@ -1,12 +1,10 @@
 {
-  "name": "sk_platform_brand_common",
-  "version": "2.1.1",
-  "description": "An out-of-box UI solution for enterprise applications",
+  "name": "node-api-export",
+  "version": "0.0.1",
+  "description": "一个快速生成api请求的工具",
   "private": true,
   "scripts": {
-    "template": "node ./template/generator/index.js",
-    "api": "node ./scripts/api.js",
-    "croot": "node ./scripts/croot.js"
+    "api": "node ./scripts/api.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
