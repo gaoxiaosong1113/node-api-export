@@ -61,7 +61,7 @@ const init = async () => {
             if (choicesRes) {
 
                 const writeFileLoading = loadingStart('写入中')
-                let getApiForJsByAppNameRes = await axios.get(`${pathHost}/project/interface?id=${choicesRes.servers}&sort=0&sbdoctimestamps=1606793605781`)
+                let getApiForJsByAppNameRes = await axios.get(`${inputRes.path}/project/interface?id=${choicesRes.servers}&sort=0&sbdoctimestamps=1606793605781`)
 
                 writeFileLoading.stop()
                 if (getApiForJsByAppNameRes.status == 200) {

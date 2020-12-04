@@ -16,7 +16,7 @@ const saveFileName = 'request.js'
 
 const headerConfig = {
 }
-console.log(axios)
+
 axios.defaults.headers.get['content-type'] = 'application/json;charset=UTF-8'
 axios.defaults.headers = {
     ...axios.defaults.headers,
@@ -56,7 +56,6 @@ const init = async () => {
             },
             responseType:'json'
         })
-        console.log(getAppNamesRes)
         if (getAppNamesRes.status == 200) {
             spinner.stop()
             let choicesRes = await inquirer.prompt([{
@@ -79,8 +78,7 @@ const init = async () => {
                 } else {
                     servers = choicesRes.servers + '/'
                 }
-                console.log(`${pathHost}/${servers}v2/api-docs`)
-                let getApiForJsByAppNameRes = await axios.get(`${pathHost}/${servers}v2/api-docs`)
+                let getApiForJsByAppNameRes = await axios.get(`${inputRes.path}/${servers}v2/api-docs`)
                 if (getApiForJsByAppNameRes.status == 200) {
                     const savePath = `${savePathPrefix}/${choicesRes.servers}`
                     const saveExists = fs.existsSync(savePath)
