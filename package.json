@@ -4,7 +4,8 @@
   "description": "一个快速生成api请求的工具",
   "private": true,
   "scripts": {
-    "api": "node ./scripts/api.js"
+    "api": "node ./scripts/api.js",
+    "xiangjiao": "node ./scripts/xiangjiao.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
