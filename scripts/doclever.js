@@ -7,17 +7,6 @@ const ejs = require('ejs')
 const path = require('path')
 const moment = require('moment')
 
-axios.defaults.withCredentials = true
-
-const headerConfig = {
-    "Accept": "application/json",
-    'Cookie': 'connect.sid=s%3AZ_a0cil86AfHqyxex12E9sG_ntBOTjk-.W7RTONKcLlVtrsu8YLlPb4nd5HQmnsqjRqQ8Ur33Pr4; id=5fc5ac4626f96723391a5c5a; name=gaoxiaosong; email=gaoxiaosong%40croot.com; loginCount=1; remember=1; __qc_wId=658; pgv_pvid=9274059359',
-}
-
-axios.defaults.headers = {
-    ...axios.defaults.headers,
-    ...headerConfig
-}
 
 const loadingStart = (loadingText) => {
     return writeFileLoading = ora(loadingText || '加载中').start()
@@ -45,13 +34,14 @@ const init = async () => {
 
         const spinner = loadingStart('加载中')
         let getAppNamesRes = await axios.get(requestPath)
+        console.log(getAppNamesRes.data)
         if (getAppNamesRes.status == 200) {
             spinner.stop()
             let choicesRes = await inquirer.prompt([{
                 type: 'list',
                 name: 'servers',
                 message: '请选择 servers 项目',
-                choices: getAppNamesRes.data.data.public.map((item, index) => {
+                choices: getAppNamesRes.data.public.map((item, index) => {
                     return {
                         name: item.name,
                         value: item._id,

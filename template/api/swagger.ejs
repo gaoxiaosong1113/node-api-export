@@ -5,8 +5,13 @@
 * * <%= tags.children[path][requestType].description %>
 */<% 
             var pathAry = path.replace(/\-/g,'').replace(/\ /g,'').split('/');
-            pathAry.splice(0, 1);
             var name = tags.children[path][requestType]['requestType']
+            var type = tags.children[path][requestType]['requestType']
+            var requestUrl = path.replace(/\{/g,`\$\{option\[\'`).replace(/\}/g,`\'\]\}`)
+            var getQuery = ''
+            if(type=='get'){
+                getQuery='${getQuery(option)}'
+            }
             for(let i=1; i<pathAry.length; i++){
                 let item = pathAry[i]
                 if(!item){
@@ -14,11 +19,12 @@
                 }
                 if(item.indexOf('{')!=-1){
                     item = item.replace('{','').replace('}','')
+                    name+=item[0].toUpperCase() + item.slice(1, item.length)
                 }else{
                     name+=item[0].toUpperCase() + item.slice(1, item.length)
                 }
             } 
         %>
-export const <%= name %> = (option) => request.<%= tags.children[path][requestType]['requestType'] %>(`<%= path.replace(/\{/g,`\$\{option\[\'`).replace(/\}/g,`\'\]\}`) %>`, option)
+export const <%= name %> = (option) => api.<%= type %>(`<%= requestUrl %><%= getQuery %>`, option)
     <% } %>
 <% } %>
