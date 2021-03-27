@@ -1,9 +1,0 @@
-/*
-    项目名称 <%= serviceId %>
-    开发者 <704041637@qq.com,https://github.com/gaoxiaosong1113>
-    私募事业部
-    生成日期 <%= date %>
-*/
-
-import request from '@/request.js'
-

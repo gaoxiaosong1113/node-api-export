@@ -131,7 +131,7 @@ const init = async config => {
             if (fs.existsSync(`${savePath}/${saveFileName}`)) fs.unlinkSync(`${savePath}/${saveFileName}`)
           }
 
-          let swaggerFile = String(fs.readFileSync(path.join(isExistsExportApi ? null : __dirname, configTemplatePath)))
+          let swaggerFile = String(fs.readFileSync(path.join(isExistsExportApi ? '' : __dirname, configTemplatePath)))
           let swaggerTemplate = ejs.compile(swaggerFile)
           let swaggerStr = swaggerTemplate({ serviceId: choicesRes.servers, date: moment().format('YYYY-MM-DD HH:mm:ss') })
 
@@ -168,6 +168,7 @@ const init = async config => {
     spinner.stop()
     throw error
   }
+  23
 }
 
 module.exports = init
