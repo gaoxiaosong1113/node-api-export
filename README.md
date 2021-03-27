@@ -1,4 +1,4 @@
-<h1 align="center">node-api-export</h1>
+<h1 align="center">export-api</h1>
 <div align="center">
 一个快速生成api请求的工具
 </div>
