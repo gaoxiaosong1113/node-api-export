@@ -18,7 +18,7 @@ var api = require('../scripts/api')
 //     'dir': process.cwd()
 //   }
 // });
-console.log(process.argv)
+
 api({
   dir: process.cwd(),
   pwd:process.argv[1]

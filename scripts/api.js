@@ -15,10 +15,10 @@ const init = async config => {
           name: 'swagger',
           value: 'swagger',
         },
-        {
-          name: 'doclever',
-          value: 'doclever',
-        },
+        // {
+        //   name: 'doclever',
+        //   value: 'doclever',
+        // },
       ],
     },
   ])
