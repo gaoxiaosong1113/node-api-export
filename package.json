@@ -1,15 +1,16 @@
 {
-  "name": "node-api-export",
+  "name": "exportApi",
   "version": "0.0.1",
   "description": "一个快速生成api请求的工具",
-  "private": true,
+  "private": false,
+  "bin": "bin/exportApi",
   "scripts": {
-    "api": "node ./scripts/api.js",
-    "xiangjiao": "node ./scripts/xiangjiao.js"
+    "api": "node ./scripts/api.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
     "inquirer": "^7.3.3",
+    "minimist": "^1.2.5",
     "moment": "^2.29.1",
     "ora": "^5.1.0",
     "request": "^2.88.2"
