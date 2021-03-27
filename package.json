@@ -1,9 +1,15 @@
 {
-  "name": "exportApi",
-  "version": "0.0.1",
+  "name": "export-api",
+  "version": "0.0.2",
   "description": "一个快速生成api请求的工具",
   "private": false,
   "bin": "bin/exportApi",
+  "keywords": [
+    "export",
+    "export-api",
+    "api",
+    "node"
+  ],
   "scripts": {
     "api": "node ./scripts/api.js"
   },
