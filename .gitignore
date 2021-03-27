@@ -48,3 +48,6 @@ services/
 request/
 node_modules/
 package-lock.json
+
+request/
+.exportApi
