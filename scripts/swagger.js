@@ -7,8 +7,17 @@ const ejs = require('ejs')
 const path = require('path')
 const moment = require('moment')
 
+let exportapirc
+let exportapircPath = process.cwd() + '/.exportapirc.js'
+// exportr-api 配置文件
+if (fs.existsSync(exportapircPath)) {
+  exportapirc = require(exportapircPath)
+}
+
+// swagger模板
 const swaggerTemplatePath = '../template/api/swagger.ejs'
 
+// 保存的文件名
 const saveFileName = 'request.js'
 
 const headerConfig = {}
@@ -19,23 +28,34 @@ axios.defaults.headers = {
   ...headerConfig,
 }
 
+/**
+ * loading
+ * @param { String } loadingText
+ * @return {*}
+ */
 const loadingStart = loadingText => {
-  return (writeFileLoading = ora(loadingText || '加载中').start())
+  return ora(loadingText || '加载中').start()
 }
-// const loadingEnd = (loadingText) => {
-//     return writeFileLoading = ora(loadingText || '加载中').start()
-// }
 
+// 验证url格式
+var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/
+var objExp = new RegExp(Expression)
+
+// 主入口
 const init = async config => {
+  // 头部模板
   let configTemplatePath = '../template/api/config.ejs'
 
   // 保存路径
   const savePathPrefix = config.dir + '/request'
-  const isExistsExportApi = fs.existsSync(config.dir + '/.exportApi')
+
+  // 判断是否有自定义模板配置
+  const isExistsExportApi = fs.existsSync(config.dir + '/.exportapi')
   if (isExistsExportApi) {
-    configTemplatePath = config.dir + '/.exportApi'
+    configTemplatePath = config.dir + '/.exportapi'
   }
 
+  // step1: 操作提示
   let confirmRes = await inquirer.prompt([
     {
       type: 'confirm',
@@ -45,27 +65,55 @@ const init = async config => {
   ])
 
   if (confirmRes.confirm) {
-    let inputRes = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'path',
-        message: '请输入swagger接口地址',
-      },
-    ])
+    // 保存路径
+    let inputRes = {
+      path: '',
+    }
+    // 如果有有配置文件使用配置文件的url
+    if (exportapirc && exportapirc.swaggerUrl) {
+      inputRes.path = exportapirc.swaggerUrl
+    } else {
+      // step2: 输入文件地址
+      inputRes = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'path',
+          message: '请输入swagger接口地址',
+        },
+      ])
+    }
+
+    // 校验url格式
+    if (objExp.test(inputRes.path) == false) {
+      console.log(chalk.red('请输入合法url地址'))
+      throw new Error('请输入合法url地址')
+    }
+
+    // 去除url最后面的 /
     if (inputRes.path[inputRes.path.length - 1] == '/') {
       inputRes.path = inputRes.path.substring(0, inputRes.path.length - 1)
     }
+
+    // 请求地址
     const requestPath = inputRes.path + '/swagger-resources'
+
+    // loading
     const spinner = loadingStart('加载中')
+
+    // 请求api分类列表
     let getAppNamesRes = await axios.get(requestPath, {
       headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
         'content-type': 'application/json;charset=UTF-8',
       },
       responseType: 'json',
     })
+    spinner.stop()
+    if (getAppNamesRes.status != 200) {
+      console.log(chalk.red('servers 列表请求失败'))
+      throw error
+    }
     if (getAppNamesRes.status == 200) {
-      spinner.stop()
+      // step3：选择分类
       let choicesRes = await inquirer.prompt([
         {
           type: 'list',
@@ -79,98 +127,79 @@ const init = async config => {
           }),
         },
       ])
-      if (choicesRes) {
-        const writeFileLoading = loadingStart('写入中')
-        // const requestPath = inputRes.path.split('/swagger-ui')[0] + '/v2/api-docs'
-        let servers
-        if (choicesRes.servers == 'default') {
-          servers = ''
-        } else {
-          servers = choicesRes.servers + '/'
-        }
-        let getApiForJsByAppNameRes = await axios.get(`${inputRes.path}/${servers}v2/api-docs`)
-        if (getApiForJsByAppNameRes.status == 200) {
-          const savePrefixExists = fs.existsSync(savePathPrefix)
-          if (!savePrefixExists) {
-            fs.mkdirSync(savePathPrefix)
-          }
-          const savePath = `${savePathPrefix}/${choicesRes.servers}`
-          const saveExists = fs.existsSync(savePath)
-          if (!saveExists) {
-            fs.mkdirSync(savePath)
-          }
-          getApiForJsByAppNameRes.data.tags.map((tagsItem, tagsindex) => {
-            if (!tagsItem.children) {
-              tagsItem.children = {}
-            }
-            // 遍历list
-            for (let pathsAttr in getApiForJsByAppNameRes.data.paths) {
-              // 拿到当前遍历项
-              let pathsItem = getApiForJsByAppNameRes.data.paths[pathsAttr]
-              // 继续遍历
-              // pathsItem为 get  post  等
-              for (let attr in pathsItem) {
-                //
-                if (pathsItem[attr].tags[0] == tagsItem.name) {
-                  if (!tagsItem.children[pathsAttr]) {
-                    tagsItem.children[pathsAttr] = {}
-                  }
-                  tagsItem.children[pathsAttr][attr] = {
-                    ...pathsItem[attr],
-                    requestType: attr,
-                  }
+
+      const writeFileLoading = loadingStart('写入中')
+
+      // 优化url结构
+      let servers = choicesRes.servers == 'default' ? '' : choicesRes.servers + '/'
+      // 分类api列表
+      let getApiForJsByAppNameRes = await axios.get(`${inputRes.path}/${servers}v2/api-docs`)
+
+      // 关闭loading
+      writeFileLoading.stop()
+      if (getApiForJsByAppNameRes.status != 200) {
+        writeFileLoading.stop()
+        console.log(chalk.red('请求文件内容失败'))
+        throw error
+      }
+      console.log('———————— export start ——————————')
+      if (getApiForJsByAppNameRes.status == 200) {
+        // 判断是否有已导出的目录
+        const savePrefixExists = fs.existsSync(savePathPrefix)
+        // 没有则创建
+        !savePrefixExists ? fs.mkdirSync(savePathPrefix) : null
+        // 判断是否有已导出的分类文件
+        const savePath = `${savePathPrefix}/${choicesRes.servers}`
+        // 没有则创建
+        !fs.existsSync(savePath) ? fs.mkdirSync(savePath) : null
+
+        // 处理swagger数据
+        getApiForJsByAppNameRes.data.tags.map((tagsItem, tagsindex) => {
+          !tagsItem.children ? (tagsItem.children = {}) : null
+          // 遍历list
+          for (let pathsAttr in getApiForJsByAppNameRes.data.paths) {
+            // 拿到当前遍历项
+            let pathsItem = getApiForJsByAppNameRes.data.paths[pathsAttr]
+            // 继续遍历
+            // pathsItem为 get  post  等
+            for (let attr in pathsItem) {
+              if (pathsItem[attr].tags[0] == tagsItem.name) {
+                if (!tagsItem.children[pathsAttr]) {
+                  tagsItem.children[pathsAttr] = {}
+                }
+                tagsItem.children[pathsAttr][attr] = {
+                  ...pathsItem[attr],
+                  requestType: attr,
                 }
               }
             }
-          })
-
-          const exists = fs.existsSync(savePath)
-          if (!exists) {
-            fs.mkdirSync(savePath)
-          } else {
-            if (fs.existsSync(`${savePath}/${saveFileName}`)) fs.unlinkSync(`${savePath}/${saveFileName}`)
           }
+        })
 
-          let swaggerFile = String(fs.readFileSync(path.join(isExistsExportApi ? '' : __dirname, configTemplatePath)))
-          let swaggerTemplate = ejs.compile(swaggerFile)
-          let swaggerStr = swaggerTemplate({ serviceId: choicesRes.servers, date: moment().format('YYYY-MM-DD HH:mm:ss') })
+        let filePath = `${savePath}/${saveFileName}`
 
-          fs.writeFileSync(`${savePath}/${saveFileName}`, swaggerStr)
+        // 如果已存在，则删除
+        fs.existsSync(filePath) ? fs.unlinkSync(filePath) : null
 
-          getApiForJsByAppNameRes.data.tags.map((item, index) => {
-            let requestFile = String(fs.readFileSync(path.join(__dirname, swaggerTemplatePath)))
-            let requestTemplate = ejs.compile(requestFile)
-            let requestStr = requestTemplate({ tags: item, str: JSON.stringify(item) })
-            fs.appendFileSync(`${savePath}/${saveFileName}`, requestStr.replace(/&#39;/g, '"'))
-            writeFileLoading.stop()
-            console.log(chalk.green(`${item.name} 生成成功`))
-          })
-        } else {
-          const message = '请求文件内容失败'
-          spinner.stop()
-          writeFileLoading.stop()
-          console.log(chalk.red(message))
-          throw error
-        }
-      } else {
-        const message = '请求接口文档地址失败'
-        spinner.stop()
-        writeFileLoading.stop()
-        console.log(chalk.red(message))
-        throw error
+        // 将内容填入文件
+        fs.writeFileSync(filePath, ejs.compile(String(fs.readFileSync(path.join(isExistsExportApi ? '' : __dirname, configTemplatePath))))({ serviceId: choicesRes.servers, date: moment().format('YYYY-MM-DD HH:mm:ss') }))
+
+        // 遍历api
+        getApiForJsByAppNameRes.data.tags.map((item, index) => {
+          // 将内容填入文件
+          fs.appendFileSync(
+            filePath,
+            ejs
+              .compile(String(fs.readFileSync(path.join(__dirname, swaggerTemplatePath))))({ tags: item, str: JSON.stringify(item) })
+              .replace(/&#39;/g, '"')
+          )
+          // 关闭loading
+          console.log(chalk.green(`export (${item.name}) api SUCCESS`))
+        })
+        console.log('———————— export end ——————————')
       }
-    } else {
-      const message = 'servers 列表请求失败'
-      spinner.stop()
-      console.log(chalk.red(message))
     }
-  } else {
-    spinner.stop()
-    throw error
   }
-  23
 }
 
 module.exports = init
-
-// init()

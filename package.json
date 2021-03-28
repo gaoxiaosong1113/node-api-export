@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "一个快速生成api请求的工具",
   "private": false,
-  "bin": "bin/exportApi",
+  "bin": "bin/export-api",
   "keywords": [
     "export",
     "export-api",
