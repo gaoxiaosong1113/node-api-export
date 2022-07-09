@@ -1,6 +1,7 @@
 <% for (let path in tags.children){ %>
     <% for (let requestType in tags.children[path]){ %>
 /**
+* * <%= tags.name %>
 * * <%= tags.children[path][requestType].summary %>
 * * <%= tags.children[path][requestType].description %>
 */<% 

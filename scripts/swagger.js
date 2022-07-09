@@ -187,6 +187,9 @@ const init = async config => {
         // 遍历api
         getApiForJsByAppNameRes.data.tags.map((item, index) => {
           // 将内容填入文件
+
+
+
           fs.appendFileSync(
             filePath,
             ejs
