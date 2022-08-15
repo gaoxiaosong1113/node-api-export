@@ -44,11 +44,5 @@ Session.vim
 .idea/
 
 # js
-services/
-request/
 node_modules/
 package-lock.json
-
-request/
-.exportApi
-.exportapirc.js
