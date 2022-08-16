@@ -21,6 +21,5 @@ var api = require('../scripts/api')
 
 api({
   dir: process.cwd(),
-  pwd:process.argv[1]
+  pwd: process.argv[1],
 })
-

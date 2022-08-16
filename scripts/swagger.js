@@ -187,9 +187,6 @@ const init = async config => {
         // 遍历api
         getApiForJsByAppNameRes.data.tags.map((item, index) => {
           // 将内容填入文件
-
-
-
           fs.appendFileSync(
             filePath,
             ejs
@@ -197,7 +194,7 @@ const init = async config => {
               .replace(/&#39;/g, '"')
           )
           // 关闭loading
-          console.log(chalk.green(`export (${item.name}) api SUCCESS`))
+          console.log(`export (${item.name}) api` + chalk.green(` SUCCESS`))
         })
         console.log('———————— export end ——————————')
       }
