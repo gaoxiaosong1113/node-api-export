@@ -22,11 +22,6 @@ const saveFileName = 'request.js'
 
 const headerConfig = {}
 
-axios.defaults.headers.get['content-type'] = 'application/json;charset=UTF-8'
-axios.defaults.headers = {
-  ...axios.defaults.headers,
-  ...headerConfig,
-}
 
 /**
  * loading

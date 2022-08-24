@@ -6,19 +6,22 @@
 * * <%= tags.children[path][requestType].description %>
 <% 
             var pathAry = path.replace(/\-/g,'').replace(/\ /g,'').split('/');
-            pathAry.splice(0, 1);
             var name = tags.children[path][requestType]['requestType']
+
             for(let i = 0; i < pathAry.length; i++){
+
                 let item = pathAry[i]
                 if( !item ){
                     continue;
                 }
                 if(item.indexOf('{') != -1){
                     item = item.replace('{','').replace('}','')
+                    name+=item[0].toUpperCase() + item.slice(1, item.length)
                 }else{
                     name += item[0].toUpperCase() + item.slice(1, item.length)
                 }
             } 
+
 %>*
 <% 
     if(tags.children[path][requestType].parameters){ 

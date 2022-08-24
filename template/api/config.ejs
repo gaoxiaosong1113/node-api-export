@@ -5,4 +5,15 @@
     生成日期 <%= date %>
 */
 
-import request from '@/request.js'
+import { gd, api } from 'rootnet-core/base'
+
+const getQuery = (option) => {
+    if (!option) {
+        return
+    }
+    let ary=[]
+    for (let attr in option) {
+        ary.push(`${attr}=${option[attr]}`)
+    }
+    return `?${ary.join('&')}`
+}
