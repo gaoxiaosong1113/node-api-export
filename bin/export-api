@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+
+var api = require('../scripts/api')
+
+// var argv = require("minimist")(process.argv.slice(2), {
+//   alias: {
+//     'config': 's',
+//     'port': 'p',
+//     'hostname': 'h',
+//     'dir': 'd',
+//     'log': 'l',
+//     'fallback': 'f'
+//   },
+//   string: ['port', 'hostname', 'fallback'],
+//   boolean: ['silent', 'log'],
+//   'default': {
+//     'port': 8000,
+//     'dir': process.cwd()
+//   }
+// });
+
+api({
+  dir: process.cwd(),
+  pwd: process.argv[1],
+})

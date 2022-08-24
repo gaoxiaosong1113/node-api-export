@@ -44,7 +44,5 @@ Session.vim
 .idea/
 
 # js
-services/
-request/
 node_modules/
 package-lock.json

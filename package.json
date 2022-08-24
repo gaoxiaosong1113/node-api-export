@@ -1,14 +1,22 @@
 {
-  "name": "node-api-export",
-  "version": "0.0.1",
+  "name": "export-api",
+  "version": "0.0.3",
   "description": "一个快速生成api请求的工具",
-  "private": true,
+  "private": false,
+  "bin": "bin/export-api",
+  "keywords": [
+    "export",
+    "export-api",
+    "api",
+    "node"
+  ],
   "scripts": {
     "api": "node ./scripts/api.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
     "inquirer": "^7.3.3",
+    "minimist": "^1.2.5",
     "moment": "^2.29.1",
     "ora": "^5.1.0",
     "request": "^2.88.2"
